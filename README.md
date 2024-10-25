@@ -1,9 +1,9 @@
-
+ 
 
 # `XLICON-V4-MD`
 <br>
 <br>
-
+   
 
 ![Typing SVG](https://readme-typing-svg.demolab.com?font=Ribeye&size=50&pause=1000&color=A93226&center=true&width=900&height=100&lines=Its%20XLICON-V4-MD;%20Multi-Device%20WhatsApp%20Bot;%20Developed%20By%20SALMAN%20AHMAD)
 <p align="center">
@@ -94,11 +94,11 @@ Click On The Link To Donate ME...
 
 2. Get Creds Json (SERVER 1)
     <br>
-<a href='https://xlicon-v3-web.onrender.com' target="_blank"><img alt='SESSION ID' src='https://img.shields.io/badge/Session_id-100000?style=for-the-badge&logo=scan&logoColor=white&labelColor=black&color=black'/></a>
+<a href='https://xlicon-web-pair-code.onrender.com/' target="_blank"><img alt='SESSION ID' src='https://img.shields.io/badge/Session_id-100000?style=for-the-badge&logo=scan&logoColor=white&labelColor=black&color=black'/></a>
 
 2. Get Creds Json (SERVER 2)
     <br>
-<a href='https://replit.com/@S4SalmanYt/XLICON-V3-PAIRING' target="_blank"><img alt='SESSION ID' src='https://img.shields.io/badge/Session_id_2-100000?style=for-the-badge&logo=scan&logoColor=white&labelColor=black&color=black'/></a>
+<a href='https://replit.com/@S4SalmanYt/XLICON-PAIR-CODE' target="_blank"><img alt='SESSION ID' src='https://img.shields.io/badge/Session_id_2-100000?style=for-the-badge&logo=scan&logoColor=white&labelColor=black&color=black'/></a>
 
 
 ## 🚀 `Deployments`
@@ -217,6 +217,14 @@ NOW Deploy👇
 <br>
 `Development , Maintainence , Bot Updates`
 
+## 🐱‍👤 `Contributer` 
+<a href="https://github.com/IRON-M4N"><img src="https://github.com/IRON-M4N.png" width="250" height="250" alt="IRON MAN"/></a>
+  
+**XLICON-V4** - By `IRON-M4N`
+<br>
+`Maintainence , Feature Testing`
+
+
 -------
 
 ## 🌈 `Support Us`
@@ -251,6 +259,22 @@ Click On The Link To Donate ME...
 ## 🔒 `Reminder`
 Misusing the bot may result in a ban from WhatsApp. Use at your own risk.
 
+## `Pannel Supoort`
+```bash
+1. Fork Repository
+2. If already forked then sync fork repository
+3. Then click on code and click download as zip
+4. Then upload script zip file to pannel
+5. Unarchieve zip sile
+6. Open bot folder and move all filea to container by (../)
+7. Now run bot
+8. After 1-2min it show enter number
+9. Enter number it will show pair code
+10. Enter pair code in linked device in whatsapp
+11. Bot Connect done now use bot 
+ 
+```
+
 
 # Install Manually 👇
 ## `Requirements`
@@ -264,6 +288,23 @@ Misusing the bot may result in a ban from WhatsApp. Use at your own risk.
 ```bash
 git clone https://github.com/<your gitHub Username>/XLICON-V4-MD.git
 cd XLICON-V4-MD
+npm start
+```
+
+## `For Ssh/Ubuntu/Linux`
+```bash
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get install -y bash
+sudo apt-get install -y libwebp
+sudo apt-get install -y git
+sudo apt-get install -y nodejs
+sudo apt-get install -y ffmpeg
+sudo apt-get install -y wget
+sudo apt-get install -y imagemagick
+git clone https://github.com/<your-gitHub-Username>/XLICON-V4-MD
+cd XLICON-V4-MD
+npm install
 npm start
 ```
 
@@ -286,22 +327,6 @@ npm i -g pm2 && pm2 start index.js && pm2 save && pm2 logs
 npm i -g pm2 && pm2 start index.js -f && pm2 save && pm2 logs
 ```
 
-## `For Ssh/Ubuntu/Linux`
-```bash
-sudo apt-get update
-sudo apt-get upgrade -y
-sudo apt-get install -y bash
-sudo apt-get install -y libwebp
-sudo apt-get install -y git
-sudo apt-get install -y nodejs
-sudo apt-get install -y ffmpeg
-sudo apt-get install -y wget
-sudo apt-get install -y imagemagick
-git clone https://github.com/<your-gitHub-Username>/XLICON-V4-MD
-cd XLICON-V4-MD
-npm install
-npm start
-```
 
 ## `For Github Codespaces`
 ```bash

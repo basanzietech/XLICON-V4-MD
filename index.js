@@ -10,13 +10,16 @@ const { exec } = require('child_process');
 const { Boom } = require('@hapi/boom');
 const NodeCache = require('node-cache');
 const PhoneNumber = require('awesome-phonenumber');
-const { default: WAConnection, useMultiFileAuthState, Browsers, DisconnectReason, makeInMemoryStore, makeCacheableSignalKeyStore, fetchLatestWaWebVersion, proto, PHONENUMBER_MCC, getAggregateVotesInPollMessage } = require('@whiskeysockets/baileys');
+const { default: WAConnection, fetchLatestBaileysVersion, useMultiFileAuthState, Browsers, DisconnectReason, makeInMemoryStore, makeCacheableSignalKeyStore, fetchLatestWaWebVersion, proto, PHONENUMBER_MCC, getAggregateVotesInPollMessage } = require('@whiskeysockets/baileys');
 
-const pairingCode = process.argv.includes('--pairing-code');
+let phoneNumber = "923184070915"
+const pairingCode = !!phoneNumber || process.argv.includes("--pairing-code")
 const useMobile = process.argv.includes("--mobile")
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) })
 const question = (text) => new Promise((resolve) => rl.question(text, resolve))
+let owner = JSON.parse(fs.readFileSync('./src/owner.json'))
+const makeWASocket = require("@whiskeysockets/baileys").default
 
 global.api = (name, path = '/', query = {}, apikeyqueryname) => (name in global.APIs ? global.APIs[name] : name) + path + (query || apikeyqueryname ? '?' + new URLSearchParams(Object.entries({ ...query, ...(apikeyqueryname ? { [apikeyqueryname]: global.APIKeys[name in global.APIs ? global.APIs[name] : name] } : {}) })) : '')
 
@@ -49,84 +52,65 @@ const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('./lib/
 const { isUrl, generateMessageTag, getBuffer, getSizeMedia, fetchJson, await, sleep } = require('./lib/function');
 
 async function startXliconBot() {
-	const { state, saveCreds } = await useMultiFileAuthState('session');
-	const { version } = await fetchLatestWaWebVersion()
-	const msgRetryCounterCache = new NodeCache()
-	const level = pino({ level: 'silent' })
-	
-	const getMessage = async (key) => {
-		if (store) {
-			const msg = await store.loadMessage(key.remoteJid, key.id);
-			return msg?.message
-		}
-		return {
-			conversation: 'Cheems Bot Here!'
-		}
-	}
-	
-	const XliconBotInc = WAConnection({
-		version,
-		logger: level,
-		printQRInTerminal: !pairingCode,
-		browser: Browsers.ubuntu('Chrome'),
-		patchMessageBeforeSending: (message) => {
-            const requiresPatch = !!(
-                message.buttonsMessage ||
-                message.templateMessage ||
-                message.listMessage
-            );
-            if (requiresPatch) {
-                message = {
-                    viewOnceMessage: {
-                        message: {
-                            messageContextInfo: {
-                                deviceListMetadataVersion: 2,
-                                deviceListMetadata: {},
-                            },
-                            ...message,
-                        },
-                    },
-                };
-            }
-            return message;
-        },
-		auth: {
-			creds: state.creds,
-			keys: makeCacheableSignalKeyStore(state.keys, level),
-		},
-		transactionOpts: {
-			maxCommitRetries: 10,
-			delayBetweenTriesMs: 10,
-		},
-		getMessage,
-		syncFullHistory: true,
-		maxMsgRetryCount: 15,
-		msgRetryCounterCache,
-		retryRequestDelayMs: 10,
-		connectTimeoutMs: 60000,
-		keepAliveIntervalMs: 10000,
-		defaultQueryTimeoutMs: undefined,
-		generateHighQualityLinkPreview: true,
-	})
-	
-	if (pairingCode && !XliconBotInc.authState.creds.registered) {
-		let phoneNumber;
-		async function getPhoneNumber() {
-			phoneNumber = await question(chalk.bgBlack(chalk.greenBright('Please type your WhatsApp number : ')));
-			phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
-			
-			if (!Object.keys(PHONENUMBER_MCC).some(v => phoneNumber.startsWith(v)) && !phoneNumber.length < 6) {
-				console.log(chalk.bgBlack(chalk.redBright('Start with your Country WhatsApp code') + chalk.whiteBright(',') + chalk.greenBright(' Example : 62xxx')));
-				await getPhoneNumber()
-			}
-		}
-		
-		setTimeout(async () => {
-			await getPhoneNumber()
-			let code = await XliconBotInc.requestPairingCode(phoneNumber);
-			console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)));
-		}, 3000)
-	}
+//------------------------------------------------------
+let { version, isLatest } = await fetchLatestBaileysVersion()
+const {  state, saveCreds } =await useMultiFileAuthState(`./session`)
+    const msgRetryCounterCache = new NodeCache() // for retry message, "waiting message"
+    const XliconBotInc = makeWASocket({
+        logger: pino({ level: 'silent' }),
+        printQRInTerminal: !pairingCode, // popping up QR in terminal log
+      browser: Browsers.windows('Firefox'), // for this issues https://github.com/WhiskeySockets/Baileys/issues/328
+     auth: {
+         creds: state.creds,
+         keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+      },
+      markOnlineOnConnect: true, // set false for offline
+      generateHighQualityLinkPreview: true, // make high preview link
+      getMessage: async (key) => {
+         let jid = jidNormalizedUser(key.remoteJid)
+         let msg = await store.loadMessage(jid, key.id)
+
+         return msg?.message || ""
+      },
+      msgRetryCounterCache, // Resolve waiting messages
+      defaultQueryTimeoutMs: undefined, // for this issues https://github.com/WhiskeySockets/Baileys/issues/276
+   })
+   
+   store.bind(XliconBotInc.ev)
+
+    // login use pairing code
+   // source code https://github.com/WhiskeySockets/Baileys/blob/master/Example/example.ts#L61
+   if (pairingCode && !XliconBotInc.authState.creds.registered) {
+      if (useMobile) throw new Error('Cannot use pairing code with mobile api')
+
+      let phoneNumber
+      if (!!phoneNumber) {
+         phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
+
+         if (!Object.keys(PHONENUMBER_MCC).some(v => phoneNumber.startsWith(v))) {
+            console.log(chalk.bgBlack(chalk.redBright("Start with country code of your WhatsApp Number, Example : +923184070915")))
+            process.exit(0)
+         }
+      } else {
+         phoneNumber = await question(chalk.bgBlack(chalk.greenBright(`Please type your WhatsApp number 😍\nFor example: +923184070915 : `)))
+         phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
+
+         // Ask again when entering the wrong number
+         if (!Object.keys(PHONENUMBER_MCC).some(v => phoneNumber.startsWith(v))) {
+            console.log(chalk.bgBlack(chalk.redBright("Start with country code of your WhatsApp Number, Example : +923184070915")))
+
+            phoneNumber = await question(chalk.bgBlack(chalk.greenBright(`Please type your WhatsApp number 😍\nFor example: +923184070915 : `)))
+            phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
+            rl.close()
+         }
+      }
+
+      setTimeout(async () => {
+         let code = await XliconBotInc.requestPairingCode(phoneNumber)
+         code = code?.match(/.{1,4}/g)?.join("-") || code
+         console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
+      }, 3000)
+   }
 	
 	store.bind(XliconBotInc.ev)
 	

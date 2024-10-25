@@ -47,7 +47,7 @@ global.location = "Pakistan, Lahore, Sabzazar" //ur location
 global.botname = 'XLICON-V4-MD' //ur bot name
 global.ownernumber = ['923184070915'] //ur owner number, dont add more than one
 global.ownername = '𝙎𝙖𝙡𝙢𝙖𝙣 𝘼𝙝𝙢𝙖𝙙' //ur owner name
-global.websitex = "https://youtu.com/@s4salmanyt"
+global.websitex = "https://youtube.com/@s4salmanyt"
 global.wagc = "https://whatsapp.com/channel/0029VaINgEZK0IBaK1nDtE3f"
 global.themeemoji = '⛩'
 global.wm = "Xlicon Bot Inc."
@@ -68,6 +68,8 @@ global.antidelete = false //set anti delete
 
 global.listv = ['•','●','■','✿','▲','➩','➢','➣','➤','✦','✧','△','❀','○','□','♤','♡','◇','♧','々','〆']
 global.tempatDB = 'database.json'
+
+
 
 global.limit = {
 	free: 100,
